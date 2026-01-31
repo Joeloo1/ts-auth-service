@@ -37,6 +37,8 @@ const login = catchAsync(
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
+    logger.info(`User logged in successfully... Email:${email}`)
+
     res.status(200).json({
       status: "success",
       message: "User logged in Successfully",
