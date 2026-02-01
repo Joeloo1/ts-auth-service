@@ -16,6 +16,8 @@ export interface IUser {
     userPassword: string,
   ): Promise<boolean>;
   refreshToken?: string;
+  passwordChangedAt: Date;
+  changedPasswordAfter(JWTTimestamp: number): boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -68,6 +70,7 @@ const userSchema: Schema<IUser> = new Schema(
       type: String,
       select: false,
     },
+    passwordChangedAt: Date,
   },
   {
     timestamps: true,
@@ -92,6 +95,18 @@ userSchema.methods.correctPassword = async function (
   userPassword: string,
 ) {
   return bcrypt.compare(plainPassword, userPassword);
+};
+
+// CHECK IF USER CHANGED PASSWORD AFTER THE TOKEN WAS ISSUED
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp: number) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      (this.passwordChangedAt.getTime() / 1000).toString(),
+      10,
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
 };
 
 const User: Model<IUser> = mongoose.model("User", userSchema);
