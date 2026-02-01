@@ -41,7 +41,7 @@ const signUp = catchAsync(
       email,
       password,
       passwordConfirm,
-      role: "user",
+      role,
     });
 
     // Generate Access and Refresh Token
