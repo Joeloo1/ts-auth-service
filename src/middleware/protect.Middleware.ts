@@ -63,17 +63,4 @@ const protect = catchAsync(
   },
 );
 
-export const getAllUser = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.find();
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        user,
-      },
-    });
-  },
-);
-
 export default protect;
