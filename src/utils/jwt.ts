@@ -16,3 +16,12 @@ export const generateRefreshToken = (userId: Types.ObjectId): string => {
     expiresIn: config.REFRESH_TOKEN_EXPIRY,
   });
 };
+
+// Verify Access Tokrn
+export const verifyAccessToken = (token: string) => {
+  return jwt.verify(token, config.ACCESS_TOKEN_SECRET);
+};
+
+export const verifyRefreshToken = (token: string) => {
+  return jwt.verify(token, config.REFRESH_TOKEN_SECRET);
+};
