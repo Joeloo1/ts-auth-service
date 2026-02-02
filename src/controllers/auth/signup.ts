@@ -7,6 +7,7 @@ import catchAsync from "../../utils/catchAsync";
 import { genUsername } from "../../utils/usernameGen";
 import logger from "../../config/logger";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
+import config from "../../config/config.env";
 
 type SignUpBody = Pick<
   IUser,
@@ -17,6 +18,20 @@ const signUp = catchAsync(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { name, email, role, password, passwordConfirm } =
       req.body as SignUpBody;
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Check whitelist
+    const isWhitelisted = config.WHITELIST_ADMINS_MAIL.map((e) =>
+      e.toLowerCase(),
+    ).includes(normalizedEmail);
+
+    // Assign role automatically
+    const userRole: "user" | "admin" = isWhitelisted ? "admin" : "user";
+    if (role === "admin" && !isWhitelisted) {
+      logger.warn(`Unauthorized admin registration attempt: ${email}`);
+      return next(new AppError("You cannot register as admin", 403));
+    }
 
     // Check if passwords match
     if (password !== passwordConfirm) {
@@ -41,7 +56,7 @@ const signUp = catchAsync(
       email,
       password,
       passwordConfirm,
-      role,
+      role: userRole,
     });
 
     // Generate Access and Refresh Token
@@ -52,13 +67,27 @@ const signUp = catchAsync(
     // Save refreshToken to DB
     await newUser.save({ validateBeforeSave: false });
 
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: config.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
     logger.info(`New user created successfully ${newUser.email}`);
+
+    const userResponse = {
+      _id: newUser._id,
+      username: newUser.username,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+    };
 
     res.status(201).json({
       status: "success",
       message: "User registered successfully",
       data: {
-        newUser,
+        newUser: userResponse,
       },
       accessToken: accessToken,
     });

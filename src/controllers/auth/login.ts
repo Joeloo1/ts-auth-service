@@ -6,6 +6,7 @@ import AppError from "../../utils/AppError";
 import catchAsync from "../../utils/catchAsync";
 import logger from "../../config/logger";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
+import config from "../../config/config.env";
 
 type LoginBody = Pick<IUser, "email" | "password">;
 
@@ -37,7 +38,13 @@ const login = catchAsync(
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
-    logger.info(`User logged in successfully... Email:${email}`)
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: config.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    logger.info(`User logged in successfully... Email:${email}`);
 
     res.status(200).json({
       status: "success",
