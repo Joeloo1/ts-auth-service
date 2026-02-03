@@ -16,6 +16,8 @@ export interface IUser {
     userPassword: string,
   ): Promise<boolean>;
   refreshToken?: string;
+  verificationToken: string | null;
+  verificationTokenExpiry: Date | null;
   passwordChangedAt: Date;
   changedPasswordAfter(JWTTimestamp: number): boolean;
   createdAt: Date;
@@ -69,6 +71,14 @@ const userSchema: Schema<IUser> = new Schema(
     refreshToken: {
       type: String,
       select: false,
+    },
+    verificationToken: {
+      type: String,
+      default: null,
+    },
+    verificationTokenExpiry: {
+      type: Date,
+      default: null,
     },
     passwordChangedAt: Date,
   },
