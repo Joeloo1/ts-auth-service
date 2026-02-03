@@ -6,7 +6,12 @@ import AppError from "../../utils/AppError";
 import catchAsync from "../../utils/catchAsync";
 import { genUsername } from "../../utils/usernameGen";
 import logger from "../../config/logger";
-import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  generateVerificationToken,
+} from "../../utils/jwt";
+import { sendEmail, getVerificationEmailHtml } from "../../utils/email_service";
 import config from "../../config/config.env";
 
 type SignUpBody = Pick<
@@ -49,6 +54,10 @@ const signUp = catchAsync(
 
     const username = genUsername();
 
+    // Generate verificationToken
+    const token = generateVerificationToken(email);
+    const tokenExpiry = new Date(Date.now() * 60 * 60 * 1000);
+
     // Create user
     const newUser = await User.create({
       username,
@@ -59,11 +68,15 @@ const signUp = catchAsync(
       role: userRole,
     });
 
+    const verifyUrl = `${process.env.CLIENT_URL}/api/auth/verify-email?token=${token}`;
+
     // Generate Access and Refresh Token
     const accessToken = generateAccessToken(newUser._id);
     const refreshToken = generateRefreshToken(newUser._id);
 
+    newUser.verificationToken = token;
     newUser.refreshToken = refreshToken;
+    newUser.verificationTokenExpiry = tokenExpiry;
     // Save refreshToken to DB
     await newUser.save({ validateBeforeSave: false });
 
@@ -71,6 +84,12 @@ const signUp = catchAsync(
       httpOnly: true,
       secure: config.NODE_ENV === "production",
       sameSite: "strict",
+    });
+
+    await sendEmail({
+      email: email,
+      subject: "Verify Your Email Address",
+      html: getVerificationEmailHtml(verifyUrl),
     });
 
     logger.info(`New user created successfully ${newUser.email}`);
@@ -85,7 +104,8 @@ const signUp = catchAsync(
 
     res.status(201).json({
       status: "success",
-      message: "User registered successfully",
+      message:
+        "User registered successfully, Please check your email to verify your account",
       data: {
         newUser: userResponse,
       },
