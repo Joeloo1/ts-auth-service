@@ -12,15 +12,6 @@ interface ITokenPayload extends JwtPayload {
   userId: Types.ObjectId;
 }
 
-// Extend Express Request interface to include 'user'
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
-}
-
 const protect = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     // Get the Token and check if it's there
