@@ -1,6 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
-import { Types } from "mongoose";
-import { JwtPayload } from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
 
 import User from "../model/userModel";
 import AppError from "../utils/AppError";
@@ -8,9 +6,7 @@ import catchAsync from "../utils/catchAsync";
 import logger from "../config/logger";
 import { verifyAccessToken } from "../utils/jwt";
 
-interface ITokenPayload extends JwtPayload {
-  userId: Types.ObjectId;
-}
+import { ITokenPayload } from "../types/auth.types";
 
 const protect = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -43,7 +39,7 @@ const protect = catchAsync(
     }
 
     // Check if user changed password after token was issued
-    if (decoded.iat && currentUser.changedPasswordAfter(decoded.iat)) {
+    if (currentUser.changedPasswordAfter(decoded.iat as number)) {
       logger.warn("User recently changed password");
       return next(
         new AppError("You recently changed password, Please login again", 401),
