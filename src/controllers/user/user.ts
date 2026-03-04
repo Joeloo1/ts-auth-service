@@ -41,6 +41,8 @@ export const updateUser = catchAsync(
 /**
  * GET USER
  */
+// user.controller.ts
+
 export const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
@@ -51,6 +53,15 @@ export const getMe = catchAsync(
     next();
   },
 );
+
+export const getUser = catchAsync(async (req: Request, res: Response) => {
+  const user = await User.findById(req.params.id);
+
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+});
 
 /**
  * DELETE ME
