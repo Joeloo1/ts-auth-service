@@ -1,8 +1,9 @@
-import mongoose, { Model, Schema } from "mongoose";
+import mongoose, { Model, Schema, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 import validator from "validator";
 
 export interface IUser {
+  _id: Types.ObjectId;
   username?: string;
   name: string;
   email: string;
@@ -19,6 +20,7 @@ export interface IUser {
   verificationToken: string | null;
   verificationTokenExpiry: Date | null;
   passwordChangedAt: Date;
+  active: boolean;
   changedPasswordAfter(JWTTimestamp: number): boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -79,6 +81,11 @@ const userSchema: Schema<IUser> = new Schema(
     verificationTokenExpiry: {
       type: Date,
       default: null,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
     },
     passwordChangedAt: Date,
   },
