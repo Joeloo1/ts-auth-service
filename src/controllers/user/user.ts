@@ -1,4 +1,5 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
+import type { AuthRequest } from "../../types/authRequest";
 
 import catchAsync from "../../utils/catchAsync";
 import AppError from "../../utils/AppError";
@@ -9,7 +10,7 @@ import User from "../../model/userModel";
  * UPDATE USER
  */
 export const updateUser = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     if (req.body.password || req.body.passwordConfirm) {
       logger.warn(
         `User attempts to user the updateMe routes to update password`,
@@ -44,7 +45,7 @@ export const updateUser = catchAsync(
 // user.controller.ts
 
 export const getMe = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new AppError("User not authenticated", 401));
     }
@@ -54,7 +55,7 @@ export const getMe = catchAsync(
   },
 );
 
-export const getUser = catchAsync(async (req: Request, res: Response) => {
+export const getUser = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = await User.findById(req.params.id);
 
   res.status(200).json({
@@ -67,7 +68,7 @@ export const getUser = catchAsync(async (req: Request, res: Response) => {
  * DELETE ME
  */
 export const deleteMe = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new AppError("User not authenticated", 401));
     }
