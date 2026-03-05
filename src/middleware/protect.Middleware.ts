@@ -38,6 +38,13 @@ const protect = catchAsync(
       return next(new AppError("User with this token no  longer exists", 401));
     }
 
+    if (!currentUser.isVerified) {
+      logger.warn("User email not verified");
+      return next(
+        new AppError("Please Verify your email to access this routes", 401),
+      );
+    }
+
     // Check if user changed password after token was issued
     if (currentUser.changedPasswordAfter(decoded.iat as number)) {
       logger.warn("User recently changed password");
