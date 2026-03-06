@@ -10,6 +10,8 @@ export interface IUser {
   isVerified: boolean;
   role: "user" | "admin";
   photo?: string;
+  provider?: "LOCAL" | "GOOGLE";
+  providerId?: string;
   password: string;
   passwordConfirm?: string;
   correctPassword(
@@ -32,6 +34,7 @@ const userSchema: Schema<IUser> = new Schema(
       type: String,
       unique: true,
       trim: true,
+      sparse: true,
     },
     name: {
       type: String,
@@ -59,16 +62,32 @@ const userSchema: Schema<IUser> = new Schema(
       type: Boolean,
       default: false,
     },
+    provider: {
+      type: String,
+      enum: ["LOCAL", "GOOGLE"],
+      default: "LOCAL",
+    },
+    providerId: String,
     password: {
       type: String,
-      required: [true, "Please provide a password"],
+      required: [
+        function (this: IUser) {
+          return this.provider === "LOCAL";
+        },
+        "Please provide a password",
+      ],
       trim: true,
       minlength: 8,
       select: false,
     },
     passwordConfirm: {
       type: String,
-      required: [true, "Please confirm your password"],
+      required: [
+        function (this: IUser) {
+          return this.provider === "LOCAL";
+        },
+        "Please confirm your password",
+      ],
     },
     refreshToken: {
       type: String,

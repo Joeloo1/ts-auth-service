@@ -11,11 +11,15 @@ import logger from "./config/logger";
 
 import authRouter from "./routes/authRoutes";
 import userRouter from "./routes/userRoutes";
+import passport from "./config/passport";
+
+require("./config/passport");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
