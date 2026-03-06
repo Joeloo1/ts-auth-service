@@ -20,6 +20,9 @@ const config = {
   VERIFICATION_SECRET_EXPIRES: process.env
     .VERIFICATION_SECRET_EXPIRES as StringValue,
   CLIENT_URL: process.env.CLIENT_URL,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!,
+  GOOGLE_REDIRECT_URL: process.env.GOOGLE_REDIRECT_URL,
 };
 
 export default config;
