@@ -6,7 +6,7 @@ import catchAsync from "../../utils/catchAsync";
 import { Types } from "mongoose";
 
 const refreshToken = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     // Retrieve refreshToken from cookie
     const { refreshToken } = req.cookies;
 

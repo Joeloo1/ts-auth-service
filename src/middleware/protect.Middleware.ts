@@ -9,7 +9,7 @@ import { verifyAccessToken } from "../utils/jwt";
 import { ITokenPayload } from "../types/auth.types";
 
 const protect = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, _res: Response, next: NextFunction) => {
     // Get the Token and check if it's there
     let token;
     if (

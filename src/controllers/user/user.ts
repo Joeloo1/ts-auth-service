@@ -42,10 +42,8 @@ export const updateUser = catchAsync(
 /**
  * GET USER
  */
-// user.controller.ts
-
 export const getMe = catchAsync(
-  async (req: AuthRequest, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, _res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new AppError("User not authenticated", 401));
     }
@@ -73,7 +71,7 @@ export const deleteMe = catchAsync(
       return next(new AppError("User not authenticated", 401));
     }
 
-    const user = await User.findByIdAndUpdate(req.user._id, { active: false });
+    await User.findByIdAndUpdate(req.user._id, { active: false });
 
     res.status(204).json({
       status: "success",

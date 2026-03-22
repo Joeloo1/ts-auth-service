@@ -6,7 +6,7 @@ import logger from "../../config/logger";
 import catchAsync from "../../utils/catchAsync";
 
 const logOut = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken as string;
 
     if (refreshToken) {

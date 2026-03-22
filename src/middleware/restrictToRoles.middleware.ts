@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 
 import AppError from "../utils/AppError";
 import logger from "../config/logger";
+import { AuthRequest } from "../types/authRequest";
 
 const restrictTo = (...roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, _res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
       logger.warn("User not authorized to perform this action");
       return next(
